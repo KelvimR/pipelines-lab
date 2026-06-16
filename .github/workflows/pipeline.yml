@@ -1,45 +1,35 @@
-name: "Estrutura de Diretórios e Arquivos"
+name: Hello GitHubActions
 
-on:
- push:
-  branches: [main]
- workflow_dispatch:
-
-env:
- NODE_VERSION: '18'
+on:  #Primeiro componente configurado
+  push:
+    branches: [main]
+  pull_request: 
+   branches: [main]
+  workflow_dispatch: 
 
 jobs:
- demonstrar-estrutura:
-  name: "Demonstrar Estrutura Básica"
-  runs-on: ubuntu-latest
+  hello-job:
+    runs-on: ubuntu-latest
 
-  steps:
-   - name: Checkout do Código
-     uses: actions/checkout@v4
-    
-   - name: Mostrar estrutura .github/workflows
-     run: |
-      echo " == ESTRUTURA DE DIRETÓRIOS E ARQUIVOS .github/workflows == "
-      ls -la .github/workflows
-      echo ""
-      echo "Total de workflows: $(ls -l .github/workflows | wc -l) "
-    
-   - name: Elementos Obigatórios do Workflow
-     run: |
-      echo " == ELEMENTOS OBRIGATÓRIOS == "
-      echo " 1. Name: Nome do workflow "
-      echo " 2. On: Evento que dispara o workflow "
-      echo " 3. jobs: Definição dos trabalhos a serem executados "
-      echo " 4. runs-on: Ambiente onde o job será executado "
-      echo " 5. steps: Passos individuais dentro de um job "
-      echo ""
-      echo " Total de elementos obrigatórios: 5"
+    steps:
+      - name: Checkout no Código
+        uses: actions/checkout@v4
 
-   - name: Váriaveis e Contexto
-     run: |
-      echo " == VARIAVEIS E CONTEXTO == "
-      echo " Variaveis env: {{ env.NODE_VERSION }}"
-      echo " 1. env: Definicao de variaveis de ambiente "
-      echo " 2. contextos: Acesso a informação do workflow, job, runner, etc."
-      echo ""
-      echo " Total de variáveis e contextos: 2"
+      - name: Executar Hello world
+        run: echo " Hello Github Actions"
+
+      - name: Mostrar Informações do Sistema
+        run: |
+         echo "Sistema Operacional: ${{ runner.os }}"
+         echo "Diretóio Atual: $(pwd)"
+         echo "Data Atual: $(date)"
+         echo "Usuário: $(whoami)"
+
+      - name: Listar Arquivos do Repositório
+        run: ls -la
+
+      - name: Comandos Multiplos
+        run: |
+         echo "Este é o Lab 01 do curso de Github Actions"
+         echo "Wokflow executado com sucesso"
+         echo "Pronto para os próximos desafios!"
