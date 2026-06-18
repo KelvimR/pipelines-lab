@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Checkout do código
-        uses: actions/checkut@v4
+        uses: actions/checkout@v4
       
       - name: Informações do push
         run: |
