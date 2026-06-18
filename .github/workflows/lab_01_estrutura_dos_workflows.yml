@@ -1,0 +1,42 @@
+name: "Estrutura de Diretóios e Arquivos" #Nome exibido na aba de actions
+
+on: #Indica quando o workflow deve ser acionado
+  push: #Quando realizo push na branch main
+    branches: [main]
+  workflow_dispatch: #Execucao manual
+
+#Aqui temos uma variavel de ambiente disponivel para todo workflow
+env: 
+  NODE_VERSION: '18'
+
+jobs:
+  demonstrar-estrutura: #Nome do Job
+    name: "Demonstrar Estrutura Básica" #Nome do pipeline quando estiver executando
+    runs-on: ubuntu-latest #Onde os steps vao ser executados
+    
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4 
+
+      - name: Mostrar estrutura .github/workflows
+        run: |
+          echo "=== ESTRUTURA DO DIRETÓRIO .github/workflows ==="
+          ls -la .github/workflows/
+          echo ""
+          echo "Total de workflows: $(ls -l .github/workflows/*y*ml 2>/dev/null | wc -l)"
+      
+      - name: Elementos obrigatórios do workflow
+        run: | 
+          echo "=== ELEMENTOS OBRIGATÓRIOS ==="
+          echo "1. name = Nome do workflow"
+          echo "2. on = Eventos de trigger (push, workflow_dispatch)"
+          echo "3. jobs = Tarefas a executar"
+          echo "4. name = Nome do workflow"
+      
+      - name: Variáveis e contextos
+        run: |
+          echo "=== VARIÁVEIS E CONTEXTOS ==="
+          echo "Variável env: ${{env.NODE_VERSION}}"
+          echo "Repositório: ${{github.repository}}"
+          echo "Branch: ${{github.ref_name}}"
+          echo "Actor: ${{github.actor}}"

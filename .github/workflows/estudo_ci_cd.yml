@@ -1,0 +1,63 @@
+# =====================================================================
+# Exemplo de pipeline CI/CD em GitHub Actions
+# Objetivo: Demonstrar boas práticas de automação em YAML
+# =====================================================================
+
+name: CI/CD Pipeline
+
+# Dispara o workflow em eventos específicos
+on:
+  push:
+    branches:
+      - main        # Executa quando há push na branch principal
+  pull_request:
+    branches:
+      - main        # Executa em PRs direcionados à branch principal
+
+# Definição dos jobs
+jobs:
+  # Job de build e testes
+  build_and_test:
+    runs-on: ubuntu-latest   # Runner padrão Linux
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Executar testes
+        run: npm test
+
+      - name: Gerar artefatos de build
+        run: npm run build
+        # Artefatos podem ser usados em outros jobs
+
+  # Job de deploy (executa apenas após sucesso do build_and_test)
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build_and_test     # Dependência: só roda se o job anterior passar
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Configurar ambiente de deploy
+        run: echo "Preparando ambiente..."
+
+      - name: Deploy para servidor
+        run: |
+          echo "Iniciando deploy..."
+          # Aqui entraria o script real de deploy (ex: rsync, kubectl, etc.)
+
+# =====================================================================
+# Notas:
+# - Este pipeline é apenas um exemplo para estudos.
+# - Em ambientes reais, configure variáveis de ambiente e segredos
+#   (como tokens de acesso) via GitHub Secrets.
+# - Estruture jobs separados para build, testes, lint e deploy.
+# =====================================================================
