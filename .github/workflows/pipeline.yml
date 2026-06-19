@@ -247,9 +247,17 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install dependencies
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies (Locust fix)
         run: |
-          pip install locust[all]
+          python -m pip install --upgrade pip
+          pip install --no-cache-dir locust gevent zope.event zope.interface
+
 
       - name: Build local Docker image for testing
         run: |
