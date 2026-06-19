@@ -21,7 +21,7 @@ jobs:
         run: |
           echo "Configurando conexao com API externa..."
           echo "URL da API: ${{secrets.API_URL }}"
-          echo "API Key está configurada: ${secrets.API_KEY:+SIM}"
+          echo "API Key está configurada: ${API_KEY:+SIM}"
 
         #simulando conexao com banco com secrets
       - name: Conectar ao banco de dados
