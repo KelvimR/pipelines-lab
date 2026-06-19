@@ -1,57 +1,90 @@
-name: Demo Github Secrets
+name: Deploy Multi-Ambientes
 
-on:
-  push: 
-    branches: [main]
+on:  
   workflow_dispatch:
     
 jobs:
-  demonstrar-secrets:
+  mostrar-variaveis-repositorios:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Fazer checkout do repositorio
-        uses: actions/checkout@v4
+      - name: Exibir variaveis de repositorio
+        run: |
+          echo "=== VARIAVEIS DE REPOSITORIO ==="
+          echo "Aplicação: ${{ vars.APP_NAME }}"
+          echo "Região: ${{ vars.DEFAULT_REGION }}"
+          echo "Timeout padrão: ${{ vars.DEFAULT_TIMEOUT }}"
+          echo "Versão do Node: ${{ vars.NODE_VERSION }}"
 
-        #Secrets em variaveis de ambientes
-      - name: Configurar credencias da API
-        env:
-          API_KEY: ${{ secrets.API_KEY }}
-          API_URL: ${{ secrets.API_URL }}
+  deploy-dev:
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Configurar ambiente DEV
         run: |
-          echo "Configurando conexao com API externa..."
-          echo "URL da API: ${{secrets.API_URL }}"
-          echo "API Key está configurada: ${API_KEY:+SIM}"
+          echo "=== DEPLOY EM DESENVOLVIMENTO ==="
+          echo "Aplicação: ${{ vars.APP_NAME }}"
+          echo "Ambiente: ${{ vars.ENVIROMENT }}"
+          echo "API URL: ${{ vars.API.URL }}"
+          echo "Database: ${{ vars.DATABASE_NAME }}"
+          echo "Regiao: ${{ vars.DEFAULT_REGION }}"
+          echo "Debug Mode: ${{ vars.DEBUG_MODE }}"
+          echo "Max Connections: ${{ vars.MAX_CONNECTIONS }}"
+      
+      - name: Simular Build para Dev
+        run: |
+          echo "Compilando aplicação paa ${{ vars.ENVIROMENT }}"
+          echo "URL de destino: ${{ vars.API_URL }}"
+          sleep 2
+          echo "Build concluido para DEV"
 
-        #simulando conexao com banco com secrets
-      - name: Conectar ao banco de dados
-        env:
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_PORT: ${{ secrets.DB_PORT }}
+  deploy-staging:
+    runs-on: ubuntu-latest
+    environment: staging
+    needs: deploy-dev
+    steps:
+      - name: Configurar ambiente staging
         run: |
-          echo "Configurando conexao com banco de dados"
-          echo "Host: ${{ secrets.DB_HOST }}"
-          echo "Porta: ${{ secrets.DB_PORT }}"
-          echo "Usuário: ${{ secrets.DB_USERNAME }}"
-          echo "Senha: ${{ secrets.DB_PASSWORD }}"
-          echo "Observe que a senha será mascarada nos logs"
-        
-         #usar secret em um token
-      - name: Preparar deploy com token
-        env:
-          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+          echo "=== DEPLOY EM STAGING ==="
+          echo "Aplicação: ${{ vars.APP_NAME }}"
+          echo "Ambiente: ${{ vars.ENVIROMENT }}"
+          echo "API URL: ${{ vars.API.URL }}"
+          echo "Database: ${{ vars.DATABASE_NAME }}"
+          echo "Regiao: ${{ vars.DEFAULT_REGION }}"
+          echo "Debug Mode: ${{ vars.DEBUG_MODE }}"
+          echo "Max Connections: ${{ vars.MAX_CONNECTIONS }}"
+
+      - name: Simular testes de integração
         run: |
-          echo "Preparando deploy..."
-          echo "Token de deploy: $DEPLOY_TOKEN"
-          echo "Github automaticamente mascara o valor real do token "
-        
-        #demonstrar secret não são expoxtas em logs
-      - name: Verificar segurança dos secrets
+          echo "Executanto testes em ${{ vars.ENVIROMENT }}"
+          echo "Endpoint: ${{ vars.API.URL }}"
+          sleep 2
+          echo "Testes aprovados em STAGING"
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    environment: production
+    needs: deploy-staging
+    steps:
+      - name: Configurar Ambiente PRODUCTION
         run: |
-          echo "Segurança dos secrets"
-          echo "- Secrets nunca aparecem em logs (são substituidos por ***)"
-          echo "- Secrets não são acessiveis em forks do repositorio"
-          echo "- Secrets só são expostos para workflows autorizados"
-          echo "- Você pode atualizar secrets sem alterar código"
+          echo "=== DEPLOY EM PRODUCTION ==="
+          echo "Aplicação: ${{ vars.APP_NAME }}"
+          echo "Ambiente: ${{ vars.ENVIROMENT }}"
+          echo "API URL: ${{ vars.API.URL }}"
+          echo "Database: ${{ vars.DATABASE_NAME }}"
+          echo "Regiao: ${{ vars.DEFAULT_REGION }}"
+          echo "Debug Mode: ${{ vars.DEBUG_MODE }}"
+          echo "Max Connections: ${{ vars.MAX_CONNECTIONS }}"
+
+      - name: Deploy em produção
+        run: |
+          echo "Realizando deploy em ${{ vars.ENVIROMENT }}"
+          echo "URL publica: ${{ vars.API_URL }}"
+          sleep 3
+          echo "Deploy em produção concluida com sucesso"
+
+      - name: Notificar equipe
+        run: |
+          echo "Enviando notifcação de deploy para ${{ vars.API_URL }} "
+          echo "Versão implantada: ${{ vars.APP_NAME }} em ${{ vars.ENVIROMENT }}"
