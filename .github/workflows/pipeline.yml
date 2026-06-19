@@ -249,7 +249,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install locust
+          pip install locust[all]
 
       - name: Build local Docker image for testing
         run: |
