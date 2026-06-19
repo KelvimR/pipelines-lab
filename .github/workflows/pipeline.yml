@@ -1,66 +1,57 @@
-name: Demonstração de Variáveis de Ambiente
+name: Demo Github Secrets
 
 on:
   push: 
     branches: [main]
   workflow_dispatch:
     
-#Variaveis de ambiente no nivel de workflow
-env:
-  WORKFLOW_VAR: "Variável definida no nivel do workflow"
-  AMBIENTE: "producao"
-
 jobs:
-  demonstracao-variaveis:
+  demonstrar-secrets:
     runs-on: ubuntu-latest
-    
-    #variaveis de ambiente nivel job
-    env:
-      JOB_VAR: "Variavel definida no nivel do job"
-      USUARIO: "devops-user"
-      VERSAO_APP: "1.0.0"
 
     steps:
-      - name: Exibir variáveis do workflow
-        run: |
-          echo "=== Variaveis do workflow ==="
-          echo "Variável WORKFLOW_VAR: ${{ env.WORKFLOW_VAR }}"
-          echo "Ambiente: ${{ env.AMBIENTE }}"
-          echo "Versão da aplicação: ${{ env.VERSAO_APP }}"
+      - name: Fazer checkout do repositorio
+        uses: actions/checkout@v4
 
-      - name: Exibir variáveis do job
-        run: |
-          echo "=== Variáveis do Job ==="
-          echo "Variavel JOB_VAR: ${{ env.JOB_VAR }}"
-          echo "Usuário: ${{ env.USUARIO }}"
-
-      - name: Exibir variavel do step
+        #Secrets em variaveis de ambientes
+      - name: Configurar credencias da API
         env:
-          STEP_VAR: "Variavel definida no nivel step"
-          MENSAGEM: "Este é um exemplo prático"
+          API_KEY: ${{ secrets.API_KEY }}
+          API_URL: ${{ secrets.API_URL }}
         run: |
-          echo "=== Variaveis do step ==="
-          echo "Variavel STEP_VAR: ${{ env.STEP_VAR }}"
-          echo "Mensagem: ${{ env.MENSAGEM }}"
+          echo "Configurando conexao com API externa..."
+          echo "URL da API: ${{secrets.API_URL }}"
+          echo "API Key está configurada: ${secrets.API_KEY:+SIM}"
 
-      - name: Combinar variaveis
-        env: 
-          STEP_ESPECIFICO: "step-value"
-        run: |
-          echo "=== Combinacao de variaveis ==="
-          echo "workflow: ${{ env.WORKFLOW_VAR }}"
-          echo "Job: ${{ env.JOB_VAR }}"
-          echo "Ambiente de deploy: ${{ env.AMBIENTE }} "
-          echo "Step: ${{ env.STEP_ESPECIFICO }}"
-          echo "Todas acessiveis no mesmo contexto"
-
-      - name: Usar variaveis em comandos práticos
+        #simulando conexao com banco com secrets
+      - name: Conectar ao banco de dados
         env:
-          NOME_PROJETO: "lab-variaveis"
-          TIMESTAMP: "2025-01-13"
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_PORT: ${{ secrets.DB_PORT }}
         run: |
-         echo "=== Exemplo pratico ==="
-         echo "Compilando projeto: ${{ env.NOME_PROJETO }}"
-         echo "Data do build: ${{ env.TIMESTAMP }}"
-         echo "Ambiente de deploy: ${{ env.AMBIENTE }}"
-         echo "Versão: ${{ env.VERSAO_APP }}"
+          echo "Configurando conexao com banco de dados"
+          echo "Host: ${{ secrets.DB_HOST }}"
+          echo "Porta: ${{ secrets.DB_PORT }}"
+          echo "Usuário: ${{ secrets.DB_USERNAME }}"
+          echo "Senha: ${{ secrets.DB_PASSWORD }}"
+          echo "Observe que a senha será mascarada nos logs"
+        
+         #usar secret em um token
+      - name: Preparar deploy com token
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+        run: |
+          echo "Preparando deploy..."
+          echo "Token de deploy: $DEPLOY_TOKEN"
+          echo "Github automaticamente mascara o valor real do token "
+        
+        #demonstrar secret não são expoxtas em logs
+      - name: Verificar segurança dos secrets
+        run: |
+          echo "Segurança dos secrets"
+          echo "- Secrets nunca aparecem em logs (são substituidos por ***)"
+          echo "- Secrets não são acessiveis em forks do repositorio"
+          echo "- Secrets só são expostos para workflows autorizados"
+          echo "- Você pode atualizar secrets sem alterar código"
